@@ -3,14 +3,14 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-# Set page configuration and load the pretrained model
+# 1. Set page configuration and load the pretrained model
 st.set_page_config(
     page_title="Pima Indians Diabetes Predictor", page_icon="🌲", layout="centered"
 )
 
 model = joblib.load("random_forest_model.joblib")
 
-# Setup the sidebar layout for inputs
+# 2. Setup the sidebar layout for inputs
 st.sidebar.header("📊 Input Patient Features")
 
 pregnancies = st.sidebar.slider(
@@ -40,6 +40,18 @@ dpf = st.sidebar.slider(
 )
 age = st.sidebar.slider("Age (years)", min_value=21, max_value=81, value=29, step=1)
 
+# 3. Map the exact feature names used during model training to avoid warnings
+feature_names = [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age",
+]
+
 # Gather current slider inputs
 raw_features = [
     pregnancies,
@@ -51,8 +63,11 @@ raw_features = [
     dpf,
     age,
 ]
-features = np.array(raw_features)
 
+# Convert to a DataFrame with valid column names
+features = pd.DataFrame([raw_features], columns=feature_names)
+
+# 4. Generate prediction and display metrics
 prediction = model.predict(features)[0]
 probabilities = model.predict_proba(features)[0]
 
